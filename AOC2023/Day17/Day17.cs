@@ -42,6 +42,10 @@ public class Day17 : Day
             var current = queue.Peek();
             var weight = queue.UnorderedItems.First(i => i.Element == current).Priority;
             queue.Dequeue();
+
+            if(new Vector(current.x, current.y) == end && current.step >= 4)
+                return weight;
+
             if (!visited.ContainsKey(current))
                 visited[current] = weight;
             else continue;
@@ -54,9 +58,6 @@ public class Day17 : Day
                     continue;
                 var newWeight = weight + map[new(n.x, n.y)];
                 queue.Enqueue(n, newWeight);
-
-                if (new Vector(n.x, n.y) == end && n.step > 2)
-                    return newWeight;
             }
         }
 
@@ -72,24 +73,24 @@ public class Day17 : Day
             switch (direction)
             {
                 case Direction.UP:
-                    if (step < 9) yield return this with { step = step + 1, y = y - 1 };
-                    if (step > 2) yield return this with { step = 0, x = x - 1, direction = Direction.LEFT };
-                    if (step > 2) yield return this with { step = 0, x = x + 1, direction = Direction.RIGHT };
+                    if (step < 10) yield return this with { step = step + 1, y = y - 1 };
+                    if (step >= 4) yield return this with { step = 1, x = x - 1, direction = Direction.LEFT };
+                    if (step >= 4) yield return this with { step = 1, x = x + 1, direction = Direction.RIGHT };
                     break;
                 case Direction.DOWN:
-                    if (step < 9) yield return this with { step = step + 1, y = y + 1 };
-                    if (step > 2) yield return this with { step = 0, x = x - 1, direction = Direction.LEFT };
-                    if (step > 2) yield return this with { step = 0, x = x + 1, direction = Direction.RIGHT };
+                    if (step < 10) yield return this with { step = step + 1, y = y + 1 };
+                    if (step >= 4) yield return this with { step = 1, x = x - 1, direction = Direction.LEFT };
+                    if (step >= 4) yield return this with { step = 1, x = x + 1, direction = Direction.RIGHT };
                     break;
                 case Direction.LEFT:
-                    if (step < 9) yield return this with { step = step + 1, x = x - 1 };
-                    if (step > 2) yield return this with { step = 0, y = y - 1, direction = Direction.UP };
-                    if (step > 2) yield return this with { step = 0, y = y + 1, direction = Direction.DOWN };
+                    if (step < 10) yield return this with { step = step + 1, x = x - 1 };
+                    if (step >= 4) yield return this with { step = 1, y = y - 1, direction = Direction.UP };
+                    if (step >= 4) yield return this with { step = 1, y = y + 1, direction = Direction.DOWN };
                     break;
                 case Direction.RIGHT:
-                    if (step < 9) yield return this with { step = step + 1, x = x + 1 };
-                    if (step > 2) yield return this with { step = 0, y = y - 1, direction = Direction.UP };
-                    if (step > 2) yield return this with { step = 0, y = y + 1, direction = Direction.DOWN };
+                    if (step < 10) yield return this with { step = step + 1, x = x + 1 };
+                    if (step >= 4) yield return this with { step = 1, y = y - 1, direction = Direction.UP };
+                    if (step >= 4) yield return this with { step = 1, y = y + 1, direction = Direction.DOWN };
                     break;
             }
         }
