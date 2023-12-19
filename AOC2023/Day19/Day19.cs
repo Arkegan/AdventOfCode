@@ -136,33 +136,66 @@ public class Day19 : Day
                     switch (property)
                     {
                         case 'x':
-                            var p1 = p with { xMax = amount - 1 };
-                            var p2 = p with { xMin = amount };
-                            yield return (p1, res);
-                            yield return (p2, null);
+                            if (amount >= p.xMin && amount < p.xMax)
+                            {
+                                var p1 = p with { xMax = (p.xMax > amount - 1) ? amount - 1 : p.xMax };
+                                yield return (p1, res);
+                                if (p.xMax > amount - 1)
+                                {
+                                    var p2 = p with { xMin = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                         case 'm':
-                            var mp1 = p with { mMax = amount - 1 };
-                            var mp2 = p with { mMin = amount };
-                            yield return (mp1, res);
-                            yield return (mp2, null);
+                            if (amount >= p.mMin && amount < p.mMax)
+                            {
+                                var p1 = p with { mMax = (p.mMax > amount - 1) ? amount - 1 : p.mMax };
+                                yield return (p1, res);
+                                if (p.mMax > amount - 1)
+                                {
+                                    var p2 = p with { mMin = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                         case 'a':
-                            var ap1 = p with { aMax = amount - 1 };
-                            var ap2 = p with { aMin = amount };
-                            yield return (ap1, res);
-                            yield return (ap2, null);
+                            if (amount >= p.aMin && amount < p.aMax)
+                            {
+                                var p1 = p with { aMax = (p.aMax > amount - 1) ? amount - 1 : p.aMax };
+                                yield return (p1, res);
+                                if (p.aMax > amount - 1)
+                                {
+                                    var p2 = p with { aMin = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                         case 's':
-                            var sp1 = p with { sMax = amount - 1 };
-                            var sp2 = p with { sMin = amount };
-                            yield return (sp1, res);
-                            yield return (sp2, null);
+                            if (amount >= p.sMin && amount < p.sMax)
+                            {
+                                var p1 = p with { sMax = (p.sMax > amount - 1) ? amount - 1 : p.sMax };
+                                yield return (p1, res);
+                                if (p.sMax > amount - 1)
+                                {
+                                    var p2 = p with { sMin = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                     }
                 }
                 else if (RuleString.Contains('>'))
                 {
+
                     var property = RuleString.First();
                     var amount = long.Parse(new string(RuleString.SkipWhile(c => !char.IsDigit(c)).TakeWhile(c => char.IsDigit(c)).ToArray()));
                     var res = RuleString.Split(':', StringSplitOptions.RemoveEmptyEntries)[1];
@@ -170,34 +203,62 @@ public class Day19 : Day
                     switch (property)
                     {
                         case 'x':
-                            var p1 = p with { xMin = amount + 1 };
-                            var p2 = p with { xMax = amount };
-                            yield return (p1, res);
-                            yield return (p2, null);
+                            if (amount < p.xMin && amount >= p.xMax)
+                            {
+                                var p1 = p with { xMin = (p.xMin > amount + 1) ? amount + 1 : p.xMin };
+                                yield return (p1, res);
+                                if (p.xMin < amount + 1)
+                                {
+                                    var p2 = p with { xMax = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                         case 'm':
-                            var mp1 = p with { xMin = amount + 1 };
-                            var mp2 = p with { xMax = amount };
-                            yield return (mp1, res);
-                            yield return (mp2, null);
+                            if (amount < p.mMin && amount >= p.mMax)
+                            {
+                                var p1 = p with { mMin = (p.mMin > amount + 1) ? amount + 1 : p.mMin };
+                                yield return (p1, res);
+                                if (p.mMin < amount + 1)
+                                {
+                                    var p2 = p with { mMax = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                         case 'a':
-                            var ap1 = p with { xMin = amount + 1 };
-                            var ap2 = p with { xMax = amount };
-                            yield return (ap1, res);
-                            yield return (ap2, null);
+                            if (amount < p.aMin && amount >= p.aMax)
+                            {
+                                var p1 = p with { aMin = (p.aMin > amount + 1) ? amount + 1 : p.aMin };
+                                yield return (p1, res);
+                                if (p.aMin < amount + 1)
+                                {
+                                    var p2 = p with { aMax = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                         case 's':
-                            var sp1 = p with { xMin = amount + 1 };
-                            var sp2 = p with { xMax = amount };
-                            yield return (sp1, res);
-                            yield return (sp2, null);
+                            if (amount < p.sMin && amount >= p.sMax)
+                            {
+                                var p1 = p with { sMin = (p.sMin > amount + 1) ? amount + 1 : p.sMin };
+                                yield return (p1, res);
+                                if (p.sMin < amount + 1)
+                                {
+                                    var p2 = p with { sMax = amount };
+                                    yield return (p2, null);
+                                }
+                            }
+                            else
+                                yield return (p, null);
                             break;
                     }
-                }
-                else
-                {
-                    yield return (p, RuleString);
                 }
             }
 
