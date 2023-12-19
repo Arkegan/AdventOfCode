@@ -1,4 +1,4 @@
-﻿
+
 using Xunit.Abstractions;
 
 namespace AOC2023.Day19;
@@ -16,7 +16,7 @@ public class Day19 : Day
         var workflows = new Dictionary<string, Workflow>();
         var s = "";
         //Parse workflow
-        while((s = inputData.ReadLine()) != string.Empty)
+        while ((s = inputData.ReadLine()) != string.Empty)
         {
             var w = new Workflow(s);
 
@@ -47,21 +47,21 @@ public class Day19 : Day
         var pr = new PartRange(1, 4000, 1, 4000, 1, 4000, 1, 4000, "in");
         var work = new List<PartRange>() { pr };
         var allRes = new List<PartRange>();
-        while(work.Count > 0)
+        while (work.Count > 0)
         {
             var curWork = work.ToList();
-            foreach(var partRange in curWork)
+            foreach (var partRange in curWork)
             {
                 work.Remove(partRange);
                 var w = workflows[partRange.workflow];
-                foreach(var res in w.Handle(partRange))
+                foreach (var res in w.Handle(partRange).ToList())
                 {
-                    if(res.workflow == "A")
+                    if (res.workflow == "A")
                     {
                         allRes.Add(res);
                         sum += res.TotalCombination;
                     }
-                    else if(res.workflow != "R")
+                    else if (res.workflow != "R")
                     {
                         work.Add(res);
                     }
@@ -79,7 +79,7 @@ public class Day19 : Day
 
     public record PartRange(long xMin, long xMax, long mMin, long mMax, long aMin, long aMax, long sMin, long sMax, string workflow)
     {
-        public long TotalCombination => (xMax-xMin) * (mMax-mMin) * (aMax-aMin) * (sMax-sMin);
+        public long TotalCombination => (xMax - xMin + 1) * (mMax - mMin + 1) * (aMax - aMin + 1) * (sMax - sMin + 1);
     }
 
     public class Workflow
@@ -103,7 +103,7 @@ public class Day19 : Day
                 toTreat.Clear();
                 foreach (var pa in work)
                 {
-                    foreach (var res in r.GetPossibilities(pa))
+                    foreach (var res in r.GetPossibilities(pa).ToList())
                     {
                         if (res.Item2 != null)
                             yield return res.Item1 with { workflow = res.Item2 };
@@ -203,9 +203,9 @@ public class Day19 : Day
                     switch (property)
                     {
                         case 'x':
-                            if (amount < p.xMin && amount >= p.xMax)
+                            if (amount > p.xMin && amount <= p.xMax)
                             {
-                                var p1 = p with { xMin = (p.xMin > amount + 1) ? amount + 1 : p.xMin };
+                                var p1 = p with { xMin = (p.xMin < amount + 1) ? amount + 1 : p.xMin };
                                 yield return (p1, res);
                                 if (p.xMin < amount + 1)
                                 {
@@ -217,9 +217,9 @@ public class Day19 : Day
                                 yield return (p, null);
                             break;
                         case 'm':
-                            if (amount < p.mMin && amount >= p.mMax)
+                            if (amount > p.mMin && amount <= p.mMax)
                             {
-                                var p1 = p with { mMin = (p.mMin > amount + 1) ? amount + 1 : p.mMin };
+                                var p1 = p with { mMin = (p.mMin < amount + 1) ? amount + 1 : p.mMin };
                                 yield return (p1, res);
                                 if (p.mMin < amount + 1)
                                 {
@@ -231,9 +231,9 @@ public class Day19 : Day
                                 yield return (p, null);
                             break;
                         case 'a':
-                            if (amount < p.aMin && amount >= p.aMax)
+                            if (amount > p.aMin && amount <= p.aMax)
                             {
-                                var p1 = p with { aMin = (p.aMin > amount + 1) ? amount + 1 : p.aMin };
+                                var p1 = p with { aMin = (p.aMin < amount + 1) ? amount + 1 : p.aMin };
                                 yield return (p1, res);
                                 if (p.aMin < amount + 1)
                                 {
@@ -245,9 +245,9 @@ public class Day19 : Day
                                 yield return (p, null);
                             break;
                         case 's':
-                            if (amount < p.sMin && amount >= p.sMax)
+                            if (amount > p.sMin && amount <= p.sMax)
                             {
-                                var p1 = p with { sMin = (p.sMin > amount + 1) ? amount + 1 : p.sMin };
+                                var p1 = p with { sMin = (p.sMin < amount + 1) ? amount + 1 : p.sMin };
                                 yield return (p1, res);
                                 if (p.sMin < amount + 1)
                                 {
@@ -260,6 +260,7 @@ public class Day19 : Day
                             break;
                     }
                 }
+                else yield return (p, RuleString);
             }
 
             public bool Apply(Part p, out string result)
