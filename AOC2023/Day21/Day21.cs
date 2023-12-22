@@ -1,6 +1,4 @@
-﻿
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace AOC2023.Day21;
