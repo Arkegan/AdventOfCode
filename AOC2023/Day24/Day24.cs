@@ -26,7 +26,7 @@ public class Day24 : Day
             hid++;
         }
 
-        
+        /*
         var count = 0;
         for(int i = 0; i != hailstones.Count - 1; i++)
         {
@@ -55,10 +55,75 @@ public class Day24 : Day
                     continue;
                 count++;
             }
+        }*/
+
+
+        //bruteforce
+        var h0 = hailstones[0];
+        var h1 = hailstones[1];
+        var h2 = hailstones[2];
+        var h3 = hailstones[3];
+        foreach (var rvx in Enumerable.Range(-300, 600))
+        {
+            foreach(var rvy in Enumerable.Range(-300, 600))
+            {
+                foreach (var rvz in Enumerable.Range(-300, 600))
+                {
+                    var h00 = h0 with { vx = h0.vx + rvx, vy = h0.vy + rvy, vz = h0.vz + rvz };
+                    var h11 = h1 with { vx = h1.vx + rvx, vy = h1.vy + rvy, vz = h1.vz + rvz };
+                    var h22 = h2 with { vx = h2.vx + rvx, vy = h2.vy + rvy, vz = h2.vz + rvz };
+                    var h33 = h3 with { vx = h3.vx + rvx, vy = h3.vy + rvy, vz = h3.vz + rvz };
+
+                    if (!h00.Intersect(h11, out var intersection1))
+                        continue;
+                    if (!h00.Intersect(h22, out var intersection2))
+                        continue;
+                    if (!h00.Intersect(h33, out var intersection3))
+                        continue;
+                    if (intersection1 != intersection2)
+                        continue;
+                    if (intersection2 != intersection3)
+                        continue;
+                    Output.WriteLine($"Found {intersection1} @ {rvx},{rvy},{rvz}");
+                    return (intersection1.X + intersection1.Y + intersection3.Z).ToString();
+                }
+            }
         }
 
-        return count.ToString();
+        return "";
+
+
+
+
+
+
+        /*
+        var sample = hailstones.Skip(5).Take(4).ToArray();
+        /*
+        //Reduce frame of reference to avoid overflow
+        var deltaX = sample[0].x;
+        var deltaY = sample[0].y;
+        var deltaZ = sample[0].z;
+
+        sample = sample.Select(h => h with { x = h.x - deltaX, y = h.y - deltaY, z = h.z - deltaZ }).ToArray();*/
+        /*
+        //take the plane defined by the first hailstone
+        var hs1 = sample[1];
+        var hs1_2 = sample[1] with { x = hs1.x + hs1.vx, y = hs1.y + hs1.vy, z = hs1.z + hs1.vz};
         
+        var plane = Vector3.Cross(hs1.Point, hs1_2.Point);
+
+        var hs2 = sample[2];
+        var hs3 = sample[3];
+
+        //find intersection of second & third hailstone with plane
+        (var hs2_2, var t2) = IntersectPlane(plane, hs2);
+        (var hs3_2, var t3) = IntersectPlane(plane, hs3);
+
+        var rockDirection = (hs2_2 - hs3_2) / (t2-t3);
+        var rockPosition = hs2_2 - rockDirection * t2;
+        return "".ToString();
+        */
         /*
         var t1 = hailstones.Select(h => h.Next).ToHashSet();
         var t2 = t1.Select(h => h.Next).ToHashSet();
@@ -94,33 +159,93 @@ public class Day24 : Day
         }
         return "";*/
     }
+    /*
+    public (Vector3, float) IntersectPlane(Vector3 plane, Hail hail)
+    {
+        var position = Vector3.Dot(plane, hail.Point);
+        var direction = Vector3.Dot(plane, hail.Direction);
+
+        var deltaTime = (position) / (direction);
+        var newPosition = hail.Point + (hail.Direction * deltaTime);
+        return (newPosition, deltaTime);
+    }*/
 
     public record Hail(int id, long x, long y, long z, long vx, long vy, long vz)
     {
-        public Vector3 Point => new(x, y, z);
-        public Vector3 Direction => new(vx, vy, vz);
+        public DecimalVector3 Point => new(x, y, z);
+        public DecimalVector3 Direction => new(vx, vy, vz);
 
         public Hail Previous => this with { x = x + vx, y = y + vy, z = z + vz };
         public Hail Next => this with { x = x+vx, y = y+vy, z = z+vz };
 
-        public bool Intersect(Hail other, out Vector3 intersection)
+        public bool Intersect(Hail other, out DecimalVector3 intersection)
         {
             var lineVec3 = other.Point - Point;
-            var crossVec1and2 = Vector3.Cross(Direction, other.Direction);
-            var crossVec3and2 = Vector3.Cross(lineVec3, other.Direction);
+            var crossVec1and2 = DecimalVector3.Cross(Direction, other.Direction);
+            var crossVec3and2 = DecimalVector3.Cross(lineVec3, other.Direction);
 
-            var planarFactor = Vector3.Dot(lineVec3, crossVec1and2);
+            var planarFactor = DecimalVector3.Dot(lineVec3, crossVec1and2);
 
-            if(MathF.Abs(planarFactor) < 0.00001f && SqrMagnitude(crossVec1and2) > 0.00001f)
+            if(planarFactor < 0.1m && SqrMagnitude(crossVec1and2) > 0.1m)
             {
-                float s = Vector3.Dot(crossVec3and2, crossVec1and2) / SqrMagnitude(crossVec1and2);
+                decimal s = DecimalVector3.Dot(crossVec3and2, crossVec1and2) / SqrMagnitude(crossVec1and2);
+
                 intersection = Point + (Direction * s);
                 return true;
             }
-            intersection = Vector3.Zero;
+            intersection = new DecimalVector3(0,0,0);
             return false;
         }
 
-        private static float SqrMagnitude(Vector3 vector) => vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z;
+        private static decimal SqrMagnitude(DecimalVector3 vector) => vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z;
+    }
+
+    public record DecimalVector3(decimal X, decimal Y, decimal Z)
+    {
+        public DecimalVector3(Vector3 vector) : this((decimal)vector.X, (decimal)vector.Y, (decimal)vector.Z)
+        {
+
+        }
+
+        public static decimal Dot(DecimalVector3 left, DecimalVector3 right)
+        {
+            return (left.X * right.X)
+                 + (left.Y * right.Y)
+                 + (left.Z * right.Z);
+        }
+        public static DecimalVector3 Cross(DecimalVector3 left, DecimalVector3 right)
+        {
+            return new DecimalVector3(
+                (left.Y * right.Z) - (left.Z * right.Y),
+                (left.Z * right.X) - (left.X * right.Z),
+                (left.X * right.Y) - (left.Y * right.X)
+            );
+        }
+
+        public static DecimalVector3 operator -(DecimalVector3 left, DecimalVector3 right)
+        {
+            return new DecimalVector3(
+                left.X - right.X,
+                left.Y - right.Y,
+                left.Z - right.Z
+            );
+        }
+        public static DecimalVector3 operator +(DecimalVector3 left, DecimalVector3 right)
+        {
+            return new DecimalVector3(
+                left.X + right.X,
+                left.Y + right.Y,
+                left.Z + right.Z
+            );
+        }
+
+        public static DecimalVector3 operator *(DecimalVector3 left, decimal right)
+        {
+            return new DecimalVector3(
+                left.X * right,
+                left.Y * right,
+                left.Z * right
+            );
+        }
     }
 }
